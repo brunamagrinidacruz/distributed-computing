@@ -11,6 +11,7 @@ from pymongo.errors import DuplicateKeyError
 import bcrypt
 import jwt
 from bson.objectid import ObjectId
+from waitress import serve
 
 regions = {"AM", "EU"}
 
@@ -39,7 +40,7 @@ parser = argparse.ArgumentParser(
                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('-n', '--name', help='name of the server', type=server_name_type)
-parser.add_argument('-p', '--port', help='server port', default=80, type=int)
+parser.add_argument('-p', '--port', help='server port', default=8080, type=int)
 parser.add_argument('-r', '--region', choices=list(regions), required=True, help='region to which this server belongs to')
 
 def create_users():
@@ -206,7 +207,7 @@ if __name__ == '__main__':
                 db.user_pokemon.create_index([("pokemon", pymongo.ASCENDING), ("user_email", pymongo.ASCENDING)], unique=True)
                 print("Collection 'user_pokemon' created")
                      
-            app.run(host='0.0.0.0', port=args.port)
+            serve(app, host='0.0.0.0', port=args.port)
                 
     except Exception as e:
         print(e)
