@@ -41,7 +41,7 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('-n', '--name', help='name of the server', type=server_name_type)
 parser.add_argument('-p', '--port', help='server port', default=8080, type=int)
-parser.add_argument('-w','--whitelist', nargs='+', help='List of IPs that can access', default="157.245.82.190")
+parser.add_argument('-w','--whitelist', nargs='+', help='List of IPs that can access', default=["157.245.82.190"])
 parser.add_argument('-r', '--region', choices=list(regions), required=True, help='region to which this server belongs to')
 
 def create_users():
