@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import request
+from flask import request, abort
 import os
 from dotenv import load_dotenv
 import argparse
@@ -41,6 +41,7 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('-n', '--name', help='name of the server', type=server_name_type)
 parser.add_argument('-p', '--port', help='server port', default=8080, type=int)
+parser.add_argument('-w','--whitelist', nargs='+', help='List of IPs that can access', default="157.245.82.190")
 parser.add_argument('-r', '--region', choices=list(regions), required=True, help='region to which this server belongs to')
 
 def create_users():
@@ -103,6 +104,12 @@ def validation(user_id):
         return "This server region is not supported"
     
     return "OK"
+
+@app.before_request
+def block_method():
+    ip = request.environ.get('REMOTE_ADDR')
+    if ip not in args.whitelist:
+        abort(403)
 
 @app.route('/signup', methods=["POST"])
 def createAccount():
