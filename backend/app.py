@@ -107,7 +107,7 @@ def validation(user_id):
 @app.before_request
 def block_method():
     ip = request.environ.get('REMOTE_ADDR')
-    if ip not in {"157.245.82.190"}:
+    if ip not in {"157.245.82.190", "127.0.0.1"}:
         abort(403)
 
 @app.route('/signup', methods=["POST"])
