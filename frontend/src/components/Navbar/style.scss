@@ -1,0 +1,58 @@
+@import '../../styles/variables.scss';
+
+.navbar {
+    box-sizing: border-box;
+    height: 100px;
+    width: 100vw;
+    padding: 0 80px;
+    background-color: $theme-red;
+    display: flex;
+    font-size: 24px;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+
+    .title {
+        font-size: 32px;
+    }
+
+    .links {
+        display: flex;
+        width: 100%;
+        justify-content: flex-end;
+        gap: 45px;
+    }
+
+    a {
+        text-decoration: none;
+        color: white;
+    }
+}
+
+.black-stripe {
+    background-color: black;
+    width: 100vw;
+    height: 10px;
+    margin-bottom: 10px;
+
+    .pokeball-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50px;
+        background-color: black;
+        position: absolute;
+        margin-top: -20px;
+        margin-left: calc(100vw/2 - 25px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .pokeball-innercircle {
+            background-color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50px;
+        }
+    }
+}
+
