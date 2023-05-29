@@ -13,6 +13,7 @@ export default function Navbar() {
                 <div className='links'>
                     <Link to={'/'}>Pokédex</Link>
                     <Link to={'/daily-pokemon'}>Daily Pokémon</Link>
+                    <Link to={'/companions'}>Companions</Link>
                     {isLoggedIn ?
                         <Link to={'/'}>Logout</Link>
                         : <>

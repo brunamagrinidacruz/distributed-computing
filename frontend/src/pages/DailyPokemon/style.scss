@@ -1,6 +1,47 @@
+@import '../../styles/variables.scss';
+
 .dailyPokemon {
     background-color: blue;
-    .h1 {
-        color: #FFDE00;
-    }
+    width: 100%;
+    margin: 0;
+    padding: 15px;
+    color: #FFDE00;
+    border-bottom: black 11px solid;
+}
+
+.pokemon-card {
+    width: 200px !important;
+    height: 280px !important;
+    margin-top: 2em !important;
+}
+
+.page-container {
+    display: flex;
+    height: 35em;
+    flex-direction: column;
+    align-items: center;
+    background: url(https://media-s3-us-east-1.ceros.com/hype-beast/images/2018/07/13/a9a51bc0b8d626db493ab5f9a971b043/background-hero.png?imageOpt=1&fit=bounds&width=2163g) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.forms-button {
+    background: $theme-blue;
+    color: white;
+    width: 50%;
+    margin-top: 2em;
+    padding: 14px;
+    border: none;
+    border-radius: 50px;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: 0.5s;
+    font-size: 20px;
+    font-family: 'Nerko One';
+}
+
+.forms-button:hover {
+    background-color: $theme-darkblue;
 }

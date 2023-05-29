@@ -5,7 +5,7 @@ import './style.scss';
 export default function Pokemon(props) {
 	return (
 		<div className="pokemon">
-			<div className="container">
+			<div className={"container " + props.className}>
 				<div className="pokemon-image-container">
 					<img src="https://www.pngall.com/wp-content/uploads/2016/06/Pokemon-PNG-HD.png" alt="Pokemon" />
 				</div>

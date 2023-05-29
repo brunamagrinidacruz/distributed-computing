@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router';
 
 import Pokedex from './pages/Pokedex';
 import DailyPokemon from './pages/DailyPokemon';
+import Companions from './pages/Companions';
 
 import './App.css';
 import Login from './pages/Login';
@@ -15,6 +16,7 @@ function App() {
 				<Route path="/daily-pokemon" element={<DailyPokemon />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/register" element={<Register />} />
+                <Route path="/companions" element={<Companions />} />
 			</Routes>
 		</div>
 	);
