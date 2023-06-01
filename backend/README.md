@@ -36,7 +36,7 @@ As máquinas virtuais em que os servidores estão hospedados foram disponibiliza
 ## Utilização
 Para utilizar o site, acesse o link [colocar aqui].
 
-Para executar um servidor isolado, utilize `python3 app.py -n <server_name> -r <region> -p <port>`.
+Para executar um servidor isolado, utilize `python3 app.py -n <server_name> -r <region> -p <port>`. Exemplo: `python3 app.py -n AM1 -r AM -p 80`.  
 Para mais informações quanto a rodar o servidor, rode `python3 app.py -h`.
 
 [etc]

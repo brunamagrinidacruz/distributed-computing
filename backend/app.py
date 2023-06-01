@@ -1,95 +1,25 @@
 from flask import Flask
 from flask import request, abort
-import os
-from dotenv import load_dotenv
-import argparse
-import re
-import pypokedex
-import random
-import pymongo
-from pymongo.errors import DuplicateKeyError
 import bcrypt
 import jwt
 from bson.objectid import ObjectId
 from waitress import serve
+import random
+import pypokedex
+from pymongo.errors import DuplicateKeyError
 
-regions = {"AM", "EU"}
+from db import MongoAPI
+from constants import REGIONS, JWT_SECRET
+from parameters import parser
 
-load_dotenv()
-        
 app = Flask(__name__)
+db = MongoAPI()
 
-def server_name_regex():
-    re_str = "^("
-    for region in regions:
-        re_str += region + "|"
-    re_str = re_str[:-1]
-        
-    re_str += ")[0-9]*$"
-    
-    return re_str
 
-def server_name_type(arg_value, pat=re.compile(server_name_regex())):
-    if not pat.match(arg_value):
-        raise argparse.ArgumentTypeError("Invalid value")
-    return arg_value
-
-parser = argparse.ArgumentParser(
-                                prog='PokemonServer',
-                                description="Server for 'SSC0904 - Sistemas Computacional Distribuídos' project",
-                                formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-parser.add_argument('-n', '--name', help='name of the server', type=server_name_type)
-parser.add_argument('-p', '--port', help='server port', default=8080, type=int)
-parser.add_argument('-r', '--region', choices=list(regions), required=True, help='region to which this server belongs to')
-
-def create_users():
-    db.create_collection('users', validator={
-        '$jsonSchema': {
-            'bsonType': 'object',
-            'additionalProperties': True,
-            'required': ['username', 'email', 'password', 'region'],
-            'properties': {
-                'username': {
-                    'bsonType': 'string'
-                },
-                'email': {
-                    'bsonType': 'string'
-                },
-                'password': {
-                    'bsonType': 'binData'
-                },
-                'region': {
-                    'enum': list(regions)
-                }
-            }
-        }
-    })
-    
-def create_user_pokemon():
-    db.create_collection('user_pokemon', validator={
-        '$jsonSchema': {
-            'bsonType': 'object',
-            'additionalProperties': True,
-            'required': ['pokemon', 'user_email', 'quantity'],
-            'properties': {
-                'pokemon': {
-                    'bsonType': 'int'
-                },
-                'user_id': {
-                    'bsonType': 'objectId'
-                },
-                'quantity': {
-                    'bsonType': 'int'
-                }
-            }
-        }
-    })
-    
 def validation(user_id):
     try:
         token = request.headers["Authorization"].split("Bearer ")[1]
-        token = jwt.decode(token, os.getenv('JWT_SECRET'), algorithms=["HS256"])
+        token = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
     except:
         return "Error on Bearer Token"
     
@@ -97,9 +27,9 @@ def validation(user_id):
         return "Access forbidden"
     
     user = db.users.find_one({"_id": ObjectId(token["id"])})
-    if user["region"] != args.region and user["region"] in regions:
+    if user["region"] != args.region and user["region"] in REGIONS:
         return "You do not have access to this server region"
-    if user["region"] != args.region and user["region"] not in regions:
+    if user["region"] != args.region and user["region"] not in REGIONS:
         return "This server region is not supported"
     
     return "OK"
@@ -141,7 +71,7 @@ def signin():
         
         if 'password' in request.json:
             if bcrypt.hashpw(body['password'].encode('utf-8'), user["password"]) == user["password"]:
-                token = jwt.encode({"id": str(user["_id"])}, os.getenv('JWT_SECRET'), algorithm='HS256')
+                token = jwt.encode({"id": str(user["_id"])}, JWT_SECRET, algorithm='HS256')
                 return token
             
             return "Wrong password/username"
@@ -196,23 +126,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     try:
-        with app.app_context():
-            client = pymongo.MongoClient(os.getenv('CONN_STR'))
-            db = client.get_database('Cluster0')
-            
-            collections = db.list_collection_names()
-            
-            if 'users' not in collections:
-                create_users()
-                db.users.create_index([("username", pymongo.ASCENDING)], unique=True)
-                db.users.create_index([("email", pymongo.ASCENDING)], unique=True)
-                print("Collection 'users' created")
-                
-            if 'user_pokemon' not in collections:
-                create_user_pokemon()
-                db.user_pokemon.create_index([("pokemon", pymongo.ASCENDING), ("user_email", pymongo.ASCENDING)], unique=True)
-                print("Collection 'user_pokemon' created")
-                     
+        with app.app_context():         
             serve(app, host='0.0.0.0', port=args.port)
                 
     except Exception as e:
