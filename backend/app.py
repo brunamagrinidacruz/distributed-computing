@@ -3,18 +3,20 @@ from flask import request, abort
 import bcrypt
 import jwt
 from bson.objectid import ObjectId
+import json
+from bson import json_util
 from waitress import serve
 import random
 import pypokedex
 from pymongo.errors import DuplicateKeyError
+from datetime import datetime
 
 from db import MongoAPI
 from constants import REGIONS, JWT_SECRET
 from parameters import parser
 
 app = Flask(__name__)
-db = MongoAPI()
-
+db = MongoAPI().db
 
 def validation(user_id):
     try:
@@ -90,24 +92,42 @@ def random_pokemon(user_id):
     message = validation(user_id)
     if message != "OK":
         return message
-
+    
+    user_id = ObjectId(user_id)
+    
     if request.method == 'POST':
-        dex = random.randint(0, 1010)
-        p = pypokedex.get(dex=dex)
-        
-        if db.user_pokemon.find_one({"pokemon": dex, "user_id": user_id}):
-            db.user_pokemon.update_one({"pokemon": dex, "user_id": user_id}, {"$inc": {'quantity': 1}})
-            return f"You got another {p.name}!"
+        today = datetime.today()
+
+        start = datetime(today.year, today.month, today.day, 00, 00, 00)
+        end = datetime(today.year, today.month, today.day, 23, 59, 59)
+
+        if db.user_pokemon.find_one({"user_id": user_id, 'date': {'$lt': end, '$gte': start}}):
+            return f"You already collect a pokemon today. Come back tomorrow for more!"
         else:
+            dex = random.randint(0, 1010)
+            p = pypokedex.get(dex=dex)
+
             db.user_pokemon.insert_one({
                 "pokemon": dex,
-                "user": user_id,
-                "quantity": 1
+                "user_id": ObjectId(user_id),
+                "date": today
             })
             return f"You got a brand new {p.name} (dex = {dex})!"
+    
     elif request.method == 'GET':
-        print(list(db.user_pokemon.find({"user_id": user_id})))
-        return list(db.user_pokemon.find({"user_id": user_id}))
+        user_pokemons = db.user_pokemon.find({"user_id": user_id})
+
+        pokemons = {}
+        for user_pokemon in user_pokemons:
+            pokemon = user_pokemon['pokemon']
+            
+            quantity = 0
+            if pokemon in pokemons:
+                quantity = pokemons[pokemon]
+
+            pokemons[pokemon] = quantity+1
+
+        return pokemons
     
     
 @app.route('/pokemon/<dex>')
