@@ -98,11 +98,9 @@ def random_pokemon(user_id):
     
     if request.method == 'POST':
         today = datetime.today()
+        today = datetime(today.year, today.month, today.day)
 
-        start = datetime(today.year, today.month, today.day, 00, 00, 00)
-        end = datetime(today.year, today.month, today.day, 23, 59, 59)
-
-        if db.user_pokemon.find_one({"user_id": user_id, 'date': {'$lt': end, '$gte': start}}):
+        if db.user_pokemon.find_one({"user_id": user_id, 'date': today}):
             return f"You already collect a pokemon today. Come back tomorrow for more!"
         else:
             dex = random.randint(0, 1010)
