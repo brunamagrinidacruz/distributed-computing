@@ -9,7 +9,7 @@ def server_name_regex():
         re_str += region + "|"
     re_str = re_str[:-1]
         
-    re_str += ")[0-9]*$"
+    re_str += ")[0-9]+$"
     
     return re_str
 
@@ -26,4 +26,3 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-n', '--name', help='name of the server', type=server_name_type)
 parser.add_argument('-p', '--port', help='server port', default=8080, type=int)
 parser.add_argument('-r', '--region', choices=list(REGIONS), required=True, help='region to which this server belongs to')
-    
