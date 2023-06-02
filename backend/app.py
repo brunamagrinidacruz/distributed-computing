@@ -97,7 +97,6 @@ def random_pokemon(user_id):
     user_id = ObjectId(user_id)
     
     if request.method == 'POST':
-        today = datetime.today()
         today = datetime(today.year, today.month, today.day)
 
         if db.user_pokemon.find_one({"user_id": user_id, 'date': today}):
