@@ -17,7 +17,6 @@ class MongoAPI:
             if 'user_pokemon' not in collections:
                   self.create_user_pokemon()
                   db.user_pokemon.create_index([("user_id", pymongo.ASCENDING), ("date", pymongo.ASCENDING)], unique=True)
-                  db.user_pokemon.create_index([("pokemon", pymongo.ASCENDING), ("user_id", pymongo.ASCENDING)], unique=True)
                   print("Collection 'user_pokemon' created")
 
       def create_users(self):

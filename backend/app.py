@@ -3,17 +3,15 @@ from flask import request, abort
 import bcrypt
 import jwt
 from bson.objectid import ObjectId
-import json
-from bson import json_util
 from waitress import serve
 import random
 import pypokedex
 from pymongo.errors import DuplicateKeyError
 from datetime import datetime
-
+import time
 from db import MongoAPI
 from constants import REGIONS, JWT_SECRET
-from parameters import parser
+from arguments import parser
 
 app = Flask(__name__)
 db = MongoAPI().db
@@ -85,6 +83,9 @@ def signin():
     
 @app.route('/ping')
 def ping():
+    server_number = int(args.name[2:])
+    if server_number % 2 == 0:
+        time.sleep(15)
     return f"Server {args.name} in region {args.region}"
 
 @app.route('/user/<user_id>/pokemon', methods=['POST', 'GET'])
