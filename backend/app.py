@@ -10,7 +10,7 @@ from pymongo.errors import DuplicateKeyError
 from datetime import datetime
 import time
 from db import MongoAPI
-from constants import REGIONS, JWT_SECRET
+from constants import REGIONS, JWT_SECRET, REVERSE_PROXY_IP
 from arguments import parser
 
 app = Flask(__name__)
@@ -37,7 +37,7 @@ def validation(user_id):
 @app.before_request
 def block_method():
     ip = request.environ.get('REMOTE_ADDR')
-    if ip != "46.101.138.40":
+    if ip != REVERSE_PROXY_IP:
         abort(403)
 
 @app.route('/signup', methods=["POST"])
