@@ -1,0 +1,7 @@
+@import "variables";
+
+@each $color-name, $color-value in $elements {
+  .container-#{$color-name} {
+    background-color: $color-value;
+  }
+}
