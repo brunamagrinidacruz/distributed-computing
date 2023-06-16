@@ -129,8 +129,26 @@ def random_pokemon(user_id):
             pokemons[pokemon] = quantity+1
 
         return pokemons
+
+@app.route('/companions/<user_id>', methods=['GET'])
+def companions(user_id):
+    message = validation(user_id)
+    if message != "OK":
+        return message
     
-    
+    users = []
+
+    user_id = ObjectId(user_id)
+    user = db.users.find_one({"_id": user_id})
+    if user:
+        region = user['region']
+        for document in db.users.find({'region': region}):
+            users.append({'username': document['username'], 'email': document['email'], 'region': document['region']})
+    else:
+        return "User not found"
+
+    return users
+
 @app.route('/pokemon/<dex>')
 def pokemon_info(dex):
     p = pypokedex.get(dex=int(dex))
