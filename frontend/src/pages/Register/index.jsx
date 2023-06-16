@@ -3,14 +3,22 @@ import React, { useState } from 'react';
 import Navbar from '../../components/Navbar';
 
 import './style.scss';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { api } from '../../api/backend';
 
 export default function Register() {
-    const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+    const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+    const navigate = useNavigate();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(formData)
+        console.log(formData);
+        try {
+            await api.post('signup', formData);
+            navigate('/');
+        } catch (err) {
+            alert(err);
+        }
     };
 
     const handleFieldUpdate = (e) => {
@@ -22,8 +30,8 @@ export default function Register() {
             <Navbar />
             <form className='register' onSubmit={handleSubmit}>
                 <span className='title'>Register</span>
-                <input name='name' type="text" className="forms-input" placeholder="Name"
-                    value={formData.name} onChange={handleFieldUpdate} required />
+                <input name='username' type="text" className="forms-input" placeholder="Username"
+                    value={formData.username} onChange={handleFieldUpdate} required />
                 <input name='email' type="email" className="forms-input" placeholder="Email"
                     value={formData.email} onChange={handleFieldUpdate} required />
                 <input name='password' type="password" className="forms-input" placeholder="Password"
