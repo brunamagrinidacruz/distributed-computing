@@ -149,18 +149,6 @@ def companions(user_id):
 
     return users
 
-@app.route('/pokemon/<dex>')
-def pokemon_info(dex):
-    p = pypokedex.get(dex=int(dex))
-    poke_dict =  {
-        "name": p.name,
-        "dex": p.dex,
-        "types": p.types,
-        "image": f"https://assets.pokemon.com/assets/cms2/img/pokedex/full/{p.dex}.png"
-    }
-    
-    return poke_dict
-
 if __name__ == '__main__':
     args = parser.parse_args()
 
