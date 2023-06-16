@@ -12,9 +12,11 @@ import time
 from db import MongoAPI
 from constants import REGIONS, JWT_SECRET, REVERSE_PROXY_IP
 from arguments import parser
+from flask_cors import CORS
 
 app = Flask(__name__)
 db = MongoAPI().db
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 def validation(user_id):
     try:
