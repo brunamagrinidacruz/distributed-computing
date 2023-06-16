@@ -15,7 +15,7 @@ export default function Companions() {
     return (
         <>
             <Navbar />
-            <div class="table-container">
+            <div className="table-container">
                 <table>
                     <caption>Usuários - {region}</caption>
                     <thead>

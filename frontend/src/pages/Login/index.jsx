@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Navbar from '../../components/Navbar';
-
+import { api } from '../../api/backend';
 import './style.scss';
-import { Link } from 'react-router-dom';
+
 
 export default function Login() {
-    const [formData, setFormData] = useState({ email: '', password: '' });
+    const [formData, setFormData] = useState({ username: '', password: '' });
+    const navigate = useNavigate();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(formData)
+        try {
+            await api.post('signin', formData);
+            navigate('/');
+        } catch (err) {
+            alert(err);
+        }
     };
 
     const handleFieldUpdate = (e) => {
@@ -22,8 +29,8 @@ export default function Login() {
             <Navbar />
             <form className='login' onSubmit={handleSubmit}>
                 <span className='title'>Login</span>
-                <input name='email' type="text" className="forms-input" placeholder="Email"
-                    value={formData.email} onChange={handleFieldUpdate} required />
+                <input name='username' type="text" className="forms-input" placeholder="Username"
+                    value={formData.username} onChange={handleFieldUpdate} required />
                 <input name='password' type="password" className="forms-input" placeholder="Password"
                     value={formData.password} onChange={handleFieldUpdate} required />
                 <span className='register-link'>
