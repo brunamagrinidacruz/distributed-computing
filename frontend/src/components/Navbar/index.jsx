@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import './style.scss';
 
 export default function Navbar() {
-    const isLoggedIn = false;
+    const jwt = JSON.parse(localStorage.getItem('jwt'));
+    const isLoggedIn = jwt !== null;
 
     return (
         <>

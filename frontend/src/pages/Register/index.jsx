@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Navbar from '../../components/Navbar';
 
@@ -7,15 +7,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../api/backend';
 
 export default function Register() {
+    const jwt = JSON.parse(localStorage.getItem('jwt'));
     const [formData, setFormData] = useState({ username: '', email: '', password: '' });
     const navigate = useNavigate();
+    
+    useEffect(() => {
+        if (jwt !== null) {
+            navigate('/');
+        }
+    }, [jwt]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(formData);
         try {
-            await api.post('signup', formData);
-            navigate('/');
+            const res = await api.post('signup', formData);
+            console.log(res.data);
+            alert('Conta criada com sucesso! Por favor faça login.');
+            navigate('/login');
         } catch (err) {
             alert(err);
         }

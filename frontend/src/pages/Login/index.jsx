@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Navbar from '../../components/Navbar';
@@ -7,13 +7,21 @@ import './style.scss';
 
 
 export default function Login() {
+    const jwt = JSON.parse(localStorage.getItem('jwt'));
     const [formData, setFormData] = useState({ username: '', password: '' });
     const navigate = useNavigate();
+    
+    useEffect(() => {
+        if (jwt !== null) {
+            navigate('/');
+        }
+    }, [jwt]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            await api.post('signin', formData);
+            const res = await api.post('signin', formData);
+            localStorage.setItem('jwt', JSON.stringify(res.data))
             navigate('/');
         } catch (err) {
             alert(err);
