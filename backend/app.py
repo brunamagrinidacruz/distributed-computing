@@ -90,7 +90,7 @@ def ping():
         time.sleep(15)
     return f"Server {args.name} in region {args.region}"
 
-@app.route('/region')
+@app.route('/region', methods=['GET'])
 def region():
     return args.region
 
@@ -116,7 +116,7 @@ def random_pokemon(user_id):
                 "date": today
             })
             
-            return dex
+            return str(dex)
     
     elif request.method == 'GET':
         user_pokemons = db.user_pokemon.find({"user_id": user_id})
