@@ -90,6 +90,10 @@ def ping():
         time.sleep(15)
     return f"Server {args.name} in region {args.region}"
 
+@app.route('/region')
+def region():
+    return args.region
+
 @app.route('/user/<user_id>/pokemon', methods=['POST', 'GET'])
 def random_pokemon(user_id):
     message = validation(user_id)
@@ -103,17 +107,16 @@ def random_pokemon(user_id):
         today = datetime(today.year, today.month, today.day)
 
         if db.user_pokemon.find_one({"user_id": user_id, 'date': today}):
-            return f"You already collect a pokemon today. Come back tomorrow for more!"
+            return f"You've already collected a pokemon today. Come back tomorrow for more!"
         else:
-            dex = random.randint(0, 1010)
-            p = pypokedex.get(dex=dex)
-
+            dex = random.randint(1, 1010)
             db.user_pokemon.insert_one({
                 "pokemon": dex,
                 "user_id": ObjectId(user_id),
                 "date": today
             })
-            return f"You got a brand new {p.name} (dex = {dex})!"
+            
+            return dex
     
     elif request.method == 'GET':
         user_pokemons = db.user_pokemon.find({"user_id": user_id})
