@@ -1,16 +1,30 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
+import { get_user_id, api } from '../../api/backend';
 
 import './style.scss';
 
 export default function Companions() {
-    const [users, setUsers] = useState();
+    const [users, setUsers] = useState([]);
     const [region, setRegion] = useState("AM");
 
     useEffect(() => {
-        // set region here
-        // set users here
+        const effect = async () => {
+            let user_id = get_user_id()
+            let token = localStorage.getItem('jwt')
+            token = token.slice(1, token.length-1);
+            let user_companions = await api.get(`/companions/${user_id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setUsers(user_companions.data);
+            let user_region = await api.get('/region');
+            setRegion(user_region.data);
+        };
+        effect();
+
     }, [])
     return (
         <>
@@ -27,36 +41,15 @@ export default function Companions() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>kibon</td>
-                            <td>kibon@gmail.com</td>
-                            <td>AM</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>sorvete</td>
-                            <td>sorvete@gmail.com</td>
-                            <td>AM</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td>otto</td>
-                            <td>otto@gmail.com</td>
-                            <td>AM</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">4</th>
-                            <td>yas</td>
-                            <td>yas@gmail.com</td>
-                            <td>AM</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">5</th>
-                            <td>magrini</td>
-                            <td>magrini@gmail.com</td>
-                            <td>AM</td>
-                        </tr>
+                        {
+                            users.map((user, index) => 
+                            <tr key={index}>
+                                <th scope="row">{index+1}</th>
+                                <td>{user.username}</td>
+                                <td>{user.email}</td>
+                                <td>{user.region}</td>
+                            </tr>)
+                        }
                     </tbody>
                 </table>
             </div>
