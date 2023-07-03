@@ -1,26 +1,66 @@
 import React, {useEffect, useState} from "react";
 
-import {getUserPokemons} from "../../api/backend";
+import {get_user_id, getUserPokemons} from "../../api/backend";
 
 import Navbar from "../../components/Navbar";
-import Pokemon from "../../components/Pokemon";
 
 import './style.scss';
+import {batchGetPokemonByIds} from "../../api/pokeApi";
+import Pokemon from "../../components/Pokemon";
 
 export default function Pokedex() {
     /** @type {number[]} */
-    const pokemonDexes = Array.from({length: 50}, (value, index) => index + 20);
+    const pokemonDexes = Array.from({length: 1010}, (value, index) => index + 1);
 
     const [userPokemons, setUserPokemons] = useState(/** @type Any */ {});
 
+    const [pokemons, setPokemons] = useState(/** @type Array.<Pokemon> */ []);
+
+    const [fetchedPokemons, setFetchedPokemons] = useState( {});
+
     useEffect(() => {
         const fetchUserPokemons = async () => {
-            const fetchedUserPokemons = await getUserPokemons(1);
+            const userId = get_user_id();
+            const fetchedUserPokemons = await getUserPokemons(userId);
             setUserPokemons(fetchedUserPokemons);
         }
 
+        const fetchPokemons = async () => {
+            const batchSize = 200;
+            const delay = 500;
+
+            const batches = [];
+            for (let i = 0; i < pokemonDexes.length; i += batchSize) {
+                const batch = pokemonDexes.slice(i, i + batchSize);
+                batches.push(batch);
+            }
+
+            for (let i = 0; i < batches.length; i++) {
+                const batch = batches[i];
+                const pokemons_ = await batchGetPokemonByIds(batch);
+
+                setFetchedPokemons(existingPokemons => ({
+                    ...existingPokemons,
+                    [i]: pokemons_
+                }));
+
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+
         fetchUserPokemons();
+        fetchPokemons();
     }, []);
+
+    useEffect(() => {
+        const pokemons_ = [];
+
+        for (const key in fetchedPokemons) {
+            pokemons_.push(...fetchedPokemons[key]);
+        }
+
+        setPokemons(pokemons_);
+    }, [fetchedPokemons]);
 
 
     /**
@@ -36,9 +76,9 @@ export default function Pokedex() {
             <Navbar />
             <div className="pokemon-list-container">
                 <div>
-                    {pokemonDexes.map(dex =>
-                        <div key={dex} className="pokemon-card-container">
-                            <Pokemon pokemonDex={dex} renderDisabled={userHasPokemon(dex)} />
+                    {pokemons.map(pokemon =>
+                        <div key={`${pokemon.id}-${Math.random()}`} className="pokemon-card-container">
+                            <Pokemon renderDisabled={userHasPokemon(pokemon.id)} pokemon={pokemon} />
                         </div>
                     )}
                 </div>

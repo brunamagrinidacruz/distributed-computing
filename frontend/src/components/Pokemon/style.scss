@@ -39,12 +39,19 @@
 			font-weight: 700;
 		}
 
+		.dex-container {
+			margin-top: 10px;
+
+			font-size: 20px;
+			font-weight: 700;
+		}
+
 		.types-container {
 
 			display: flex;
 			width: fit-content;
 
-			margin: 70px auto 0;
+			margin: 50px auto 0;
 
 
 			.type-container {

@@ -5,24 +5,13 @@ import {getPokemonById} from "../../api/pokeApi";
 
 /**
  *
- * @param {{pokemonDex: number, renderDisabled: boolean}} props
+ * @param {{pokemonDex: number, renderDisabled: boolean, pokemon: Pokemon}} props
  * @returns {JSX.Element}
  * @constructor
  */
 
 export default function Pokemon(props) {
-	const { pokemonDex , renderDisabled } = props;
-
-	const [pokemon, setPokemon] = useState(/** @type {Pokemon | null} */null);
-
-	useEffect(() => {
-		const fetchPokemon = async () => {
-			const fetchedPokemon = await getPokemonById(pokemonDex);
-			setPokemon(fetchedPokemon);
-		}
-
-		fetchPokemon();
-	}, []);
+	const { renderDisabled, pokemon } = props;
 
 	return (
 		<div className="pokemon">
@@ -32,7 +21,11 @@ export default function Pokemon(props) {
 				</div>
 
 				<div className="name-container">
-					<span>{pokemon ? pokemon.name.toUpperCase() : "Piplup"}</span>
+					<span>{pokemon.name.toUpperCase()}</span>
+				</div>
+
+				<div className="dex-container">
+					<span>#{pokemon.id}</span>
 				</div>
 
 				<div className="types-container">

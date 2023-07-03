@@ -37,3 +37,19 @@ export async function getPokemonById(id) {
         console.log(e);
     }
 }
+
+/**
+ *
+ * @param {Array.<number>} ids
+ * @returns {Promise<Array.<Pokemon>>}
+ */
+export async function batchGetPokemonByIds(ids) {
+    const requests = ids.map(id => axios.get(`${baseUrl}/pokemon/${id}/`));
+
+    try {
+        const responses = await Promise.all(requests);
+        return responses.map(res => res.data);
+    } catch (e) {
+        console.log({error: e});
+    }
+}

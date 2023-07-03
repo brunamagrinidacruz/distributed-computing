@@ -62,9 +62,14 @@ export function getCookie(cname) {
  * @returns {Any}
  */
 export async function getUserPokemons(userId) {
-    return {
-        "23": 2,
-        "24": 3,
-        "25": 1
-    }
+    const jwt = localStorage.getItem('jwt')
+    const token = jwt.slice(1, jwt.length-1);
+
+    const res = await api.get(`user/${userId}/pokemon`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    return res.data;
 }
