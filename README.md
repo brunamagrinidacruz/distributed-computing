@@ -32,7 +32,7 @@ Foi utilizado o MongoDB como SGBD do nosso sistema. A arquitetura do banco de da
 
 Utilizamos o NGINX para os Load Balancers e para o Reverse Proxy.
 
-********************TODO Adicionar as tecnologias do front-end
+No frontend, foi usado o framework React para a construção das telas.
 
 As máquinas virtuais em que os servidores estão hospedados são do DigitalOcean, sendo:
 Descrição    | Caminho
@@ -129,15 +129,26 @@ Observação: Caso o Nginx não esteja na mesma máquina que as instâncias, é 
 
 ## Front-end
 
-*************TODO Criar o passo a passo de instalão e utilização
-
 ### Instalação
 
-...
+Parar instalar o app, é necessário apenar possuir o `npm` instalado na máquina. Uma vez instalado,
+basta rodar o comando:
+
+```shell
+npm install
+```
 
 ### Utilização
 
-...
+Para executar a aplicação, basta usar o comando do `npm`:
+
+```shell
+npm start
+```
+
+A aplicação deve abrir no browser. Caso o usuário não tenha uma conta, basta criar uma na seção
+Register e logar na Login. Após isso, o usuário pode acessar a sua Pokedex, obter seu Pokemon
+diário ou ver os usuários cadastrados naquela região.
 
 ## Integrantes
 Nome    | Número USP
