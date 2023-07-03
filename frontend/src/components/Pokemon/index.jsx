@@ -11,26 +11,45 @@ import {getPokemonById} from "../../api/pokeApi";
  */
 
 export default function Pokemon(props) {
-	const { renderDisabled, pokemon } = props;
+	const { pokemonDex , renderDisabled, pokemon } = props;
+
+	const [renderedPokemon, setRenderedPokemon] = useState(/** @type {Pokemon | null} */null);
+
+	useEffect(() => {
+		const fetchPokemon = async () => {
+			try {
+				const fetchedPokemon = await getPokemonById(pokemonDex);
+				setRenderedPokemon(fetchedPokemon);
+			} catch (error) {
+				console.log(error);
+			}
+		}
+
+		if (!pokemon) {
+			fetchPokemon();
+		} else {
+			setRenderedPokemon(pokemon);
+		}
+	}, []);
 
 	return (
 		<div className="pokemon">
 			<div className={`container render-disabled-${renderDisabled}`}>
 				<div className="pokemon-image-container">
-					<img src={pokemon && pokemon.sprites.front_default} alt="Pokemon" />
+					<img src={renderedPokemon && renderedPokemon.sprites.front_default} alt="Pokemon" />
 				</div>
 
 				<div className="name-container">
-					<span>{pokemon.name.toUpperCase()}</span>
+					<span>{renderedPokemon && renderedPokemon.name.toUpperCase()}</span>
 				</div>
 
 				<div className="dex-container">
-					<span>#{pokemon.id}</span>
+					<span>#{renderedPokemon && renderedPokemon.id}</span>
 				</div>
 
 				<div className="types-container">
-					{pokemon && pokemon.types.map(type =>
-						<div key={`${pokemon.name}-${type.type.name}`} className={`type-container container-${type.type.name}`}>
+					{renderedPokemon && renderedPokemon.types.map(type =>
+						<div key={`${renderedPokemon.name}-${type.type.name}`} className={`type-container container-${type.type.name}`}>
 							<span className="type">{type.type.name}</span>
 						</div>
 					)}
