@@ -9,58 +9,75 @@ import {batchGetPokemonByIds} from "../../api/pokeApi";
 import Pokemon from "../../components/Pokemon";
 
 export default function Pokedex() {
-    /** @type {number[]} */
-    const pokemonDexes = Array.from({length: 1010}, (value, index) => index + 1);
-
     const [userPokemons, setUserPokemons] = useState(/** @type Any */ {});
 
     const [pokemons, setPokemons] = useState(/** @type Array.<Pokemon> */ []);
 
-    const [fetchedPokemons, setFetchedPokemons] = useState( {});
+    const [reachedEnd, setReachedEnd] = useState(true);
+
+    const [dexOffset, setDexOffset] = useState(0);
+
+    const [endScrolling, setEndScrolling] = useState(false);
+
+    const batchSize = 200;
+
+    const fetchUserPokemons = async () => {
+        const userId = get_user_id();
+
+        if (!userId) {
+            return;
+        }
+
+        const fetchedUserPokemons = await getUserPokemons(userId);
+        setUserPokemons(fetchedUserPokemons);
+    }
+
+    const fetchPokemons = async () => {
+        console.log("Hello");
+        const batch = Array.from({length: batchSize}, (value, index) => index + dexOffset + 1);
+
+        const newPokemons = await batchGetPokemonByIds(batch);
+
+        setPokemons(existingPokemons => ([
+            ...existingPokemons,
+            ...newPokemons
+        ]));
+    }
 
     useEffect(() => {
-        const fetchUserPokemons = async () => {
-            const userId = get_user_id();
-            const fetchedUserPokemons = await getUserPokemons(userId);
-            setUserPokemons(fetchedUserPokemons);
-        }
-
-        const fetchPokemons = async () => {
-            const batchSize = 200;
-            const delay = 500;
-
-            const batches = [];
-            for (let i = 0; i < pokemonDexes.length; i += batchSize) {
-                const batch = pokemonDexes.slice(i, i + batchSize);
-                batches.push(batch);
-            }
-
-            for (let i = 0; i < batches.length; i++) {
-                const batch = batches[i];
-                const pokemons_ = await batchGetPokemonByIds(batch);
-
-                setFetchedPokemons(existingPokemons => ({
-                    ...existingPokemons,
-                    [i]: pokemons_
-                }));
-
-                await new Promise(resolve => setTimeout(resolve, delay));
-            }
-        }
-
         fetchUserPokemons();
-        fetchPokemons();
     }, []);
 
     useEffect(() => {
-        const pokemons_ = [];
+        fetchPokemons();
+        setReachedEnd(false);
+    }, [userPokemons]);
 
-        for (const key in fetchedPokemons) {
-            pokemons_.push(...fetchedPokemons[key]);
+    useEffect(() => {
+        const nextDex = dexOffset + batchSize;
+
+        if (nextDex > 1010 - batchSize) {
+            setEndScrolling(true);
+        } else {
+            setDexOffset(nextDex);
         }
+    }, [pokemons])
 
-        setPokemons(pokemons_);
-    }, [fetchedPokemons]);
+    const handleScroll = () => {
+        const scrollPosition = window.innerHeight + document.documentElement.scrollTop;
+        const componentHeight = document.documentElement.offsetHeight;
+
+        if (scrollPosition >= componentHeight && !reachedEnd && !endScrolling) {
+            setReachedEnd(true);
+            fetchPokemons();
+            setReachedEnd(false);
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [pokemons]);
 
 
     /**
@@ -76,8 +93,8 @@ export default function Pokedex() {
             <Navbar />
             <div className="pokemon-list-container">
                 <div>
-                    {pokemons.map(pokemon =>
-                        <div key={`${pokemon.id}-${Math.random()}`} className="pokemon-card-container">
+                    {pokemons.map((pokemon, index) =>
+                        <div key={index} className="pokemon-card-container">
                             <Pokemon renderDisabled={userHasPokemon(pokemon.id)} pokemon={pokemon} />
                         </div>
                     )}

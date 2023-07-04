@@ -12,7 +12,17 @@ export const api = axios.create({
  */
 export function get_user_id() {
     let token = localStorage.getItem("jwt");
+
+    if (!token) {
+        return null;
+    }
+
     let base64Url = token.split('.')[1];
+
+    if (!base64Url) {
+        return null;
+    }
+
     let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);

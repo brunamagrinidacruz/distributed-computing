@@ -20,7 +20,13 @@ export default function DailyPokemon() {
     // function that sets pokemon by getting from API Call
     async function getRandomPokemon() {
         console.log(pokemon);
-        let token = localStorage.getItem('jwt')
+        let token = localStorage.getItem('jwt');
+
+        if (!token) {
+            alert("Você precisa estar logado para pegar um pokemon");
+            return;
+        }
+
         token = token.slice(1, token.length-1);
         console.log(token);
         let user_id = get_user_id();
