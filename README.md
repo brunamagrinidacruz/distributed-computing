@@ -49,7 +49,7 @@ Observação: As aplicações só aceitam requisições encaminhadas pelo Nginx,
 
 ### Instalação 
 
-É recomendado o uso de Python Virtual Envirorment. Então para criá-lo e ativá-lo:
+É recomendado o uso de Python Virtual Environment. Então para criá-lo e ativá-lo:
 ```
 python3 -m venv venv
 source venv/bin/activate
@@ -70,7 +70,7 @@ python3 app.py -n AM1 -r AM -p 80
 ```
 Para mais informações quanto a rodar o servidor, rode `python3 app.py -h`.
 
-Por fim, para a aplicação funcionar conforme descrito anteriormente, é necessário criar 4 instâncias. Considerando que todas as instâncias estão em um mesmo servidor por simplicidade, elas podem ser criadas com os comandos:
+Por fim, para a aplicação funcionar conforme descrito anteriormente, é necessário criar 4 instâncias. Considerando que todas as instâncias estão em uma mesma máquina por simplicidade, elas podem ser criadas com os comandos:
 ```
 python3 app.py -n AM1 -r AM -p 8081 &
 python3 app.py -n AM2 -r AM -p 8082 &
@@ -83,7 +83,7 @@ Para confirmar que tudo funcionou, utilize:
 ```
 curl 127.0.0.1:[porta]/ping
 ```
-Observação: No caso de servidores com digito par (como AM2), a requisição para ```/ping``` possui um atraso de 15 segundos para simular uma requisição com bastante carga.
+Observação: No caso de servidores com dígito par (como AM2), a requisição para ```/ping``` possui um atraso de 15 segundos para simular uma requisição com bastante carga.
 
 ## Reverse Proxy & Load Balancer
 
@@ -96,7 +96,69 @@ Para instalar, use o comando:
 apt install nginx
 ```
 
-*************** TODO Escrever sobre instalação do pacote de geo
+Para a instalação do GeoIP2, o módulo dinâmico de redirecionamento geográfico, seguiu-se os seguintes tutoriais:
+[tutorial 1](https://dokov.bg/nginx-geoip2) e [tutorial 2](https://medium.com/@maxime.durand.54/add-the-geoip2-module-to-nginx-f0b56e015763).
+
+Primeiro, deve-se executar o seguinte comando:
+```
+sudo add-apt-repository ppa:maxmind/ppa
+
+sudo apt update
+sudo apt install geoipupdate libmaxminddb0 libmaxminddb-dev mmdb-bin
+```
+
+Após isso, é necessário criar uma conta no site da [MaxMind](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data) e gerar uma license key para a versão Lite do GeoIP2 que é grátis, porém menos precisa.
+
+No arquivo `/etc/GeoIP.conf`, deverá editar o AccountID e o LicenseKey:
+```
+# /etc/GeoIP.conf
+# Replace YOUR_ACCOUNT_ID_HERE and YOUR_LICENSE_KEY_HERE with an active account
+# ID and license key combination associated with your MaxMind account. These
+# are available from https://www.maxmind.com/en/my_license_key.
+AccountID YOUR_ACCOUNT_ID_HERE
+LicenseKey YOUR_LICENSE_KEY_HERE
+
+# Enter the edition IDs of the databases you would like to update.
+# Multiple edition IDs are separated by spaces.
+EditionIDs GeoLite2-ASN GeoLite2-City GeoLite2-Country
+```
+
+Após isso deverá executar o comando a seguir para aplicar as configurações:
+```
+sudo geoipupdate
+```
+E adicionar um cron job para permitir updates diários:
+```
+sudo crontab -e
+# Run GeoIP database update all the thuesday at 02:00
+0 2 * * 2 /usr/bin/geoipupdate
+```
+
+A partir daí segue-se integralmente o [seguinte tutorial](https://dokov.bg/nginx-geoip2).
+
+```
+load_module modules/ngx_http_geoip2_module.so;
+
+http {
+    geoip2 /usr/share/GeoIP/GeoLite2-Country.mmdb {
+        auto_reload 60m;
+        $geoip2_metadata_country_build metadata build_epoch;
+        $geoip2_data_continent_code continent code;
+    }
+
+    ...
+    ...
+    ...
+
+    map $geoip2_data_continent_code $nearest_server {
+        EU      eu;
+        NA      am;
+        SA      am;
+    }
+}
+```
+
+A seguinte configuração foi usada para utilizar o GeoIP2 para distribuir as requisições de acordo com o IP do request. Como pode ser visto, a partir do Continent Code, foi criado um `map` em que os codes NA e SA do GeoIP2 foram relacionados ao upstream am, enquanto EU foi relacionado ao upstream eu.
 
 ### Utilização
 
