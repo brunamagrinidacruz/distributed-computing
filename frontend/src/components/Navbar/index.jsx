@@ -23,10 +23,12 @@ export default function Navbar() {
                 <Link to={'/'} className='title'>POKÉDEX</Link>
                 <div className='links'>
                     <Link to={'/'}>Pokédex</Link>
-                    <Link to={'/daily-pokemon'}>Daily Pokémon</Link>
-                    <Link to={'/companions'}>Companions</Link>
                     {isLoggedIn ?
-                        <Link onClick={handleLogout}>Logout</Link>
+                        <>
+                            <Link to={'/daily-pokemon'}>Daily Pokémon</Link>
+                            <Link to={'/companions'}>Companions</Link>
+                            <Link onClick={handleLogout}>Logout</Link>
+                        </>
                         : <>
                             <Link to={'/login'}>Login</Link>
                             <Link to={'/register'}>Register</Link>
