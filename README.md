@@ -220,3 +220,7 @@ Gabriel Freitas Ximenes de Vasconcelos | 11819084
 Otto Cruz Fernandes | 11275130
 Raíssa Torres Barreira | 11796336
 Yasmin Osajima de Araújo | 11219004
+
+---
+
+Project for Distributed Computing Systems (SSC0904) - Computer Science @ Instituto de Ciências Matemáticas e de Computação (ICMC) - Universidade de São Paulo (USP). São Carlos, Brazil, 2023.
